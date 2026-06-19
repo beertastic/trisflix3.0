@@ -1,39 +1,18 @@
-  Ah, I see! You mean the .github/workflows/deploy.yml file on your development laptop was cleared out.
+name: Deploy to Raspberry Pi
 
-    No problem at all. Let's put that file right back into your local project so you can commit it to GitHub.
+on:
+  push:
+    branches: [ "main" ]
 
-  Step 1: Create the workflow file in PHPStorm
-    In PHPStorm, look at your project file tree on the left.
-
-    If they don't exist, create a folder named .github at the very root, and a subfolder inside it named workflows.
-
-    Right-click the workflows folder, choose New > File, and name it deploy.yml.
-
-  Step 2: Paste the complete GitHub Actions code
-  Paste this exact configuration into your new deploy.yml file:
-
-    YAML
-  name: Deploy to Raspberry Pi
-
-  on:
-    push:
-      branches: [ "main" ]
-    pull_request:
-      branches: [ "main" ]
-      types: [ closed ]
-
-  jobs:
-    deploy:
-      # Only run if it's a direct push OR a merged PR
-      if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true)
-      runs-on: ubuntu-latest
-
-      steps:
-        - name: Execute remote deployment script via SSH
-          uses: appleboy/ssh-action@v1.0.3
-          with:
-            host: ${{ secrets.PI_HOST }}
-            username: ${{ secrets.PI_USERNAME }}
-            key: ${{ secrets.PI_SSH_KEY }}
-            port: 22
-            script: /var/www/trisflix.com/deploy.sh
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Execute remote deployment script via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.PI_HOST }}
+          username: ${{ secrets.PI_USERNAME }}
+          key: ${{ secrets.PI_SSH_KEY }}
+          port: 22
+          script: /var/www/trisflix.com/deploy.sh
